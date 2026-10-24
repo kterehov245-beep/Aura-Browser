@@ -13,9 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
  
-      - name: Unpack project
-        run: unzip -q AuraBrowser.zip
+      - name: Unpack newest zip
+        run: |
+          git -c core.quotepath=false log --diff-filter=AM --name-only --pretty=format: -- '*.zip' | grep -v '^$' > /tmp/zips.txt
+          newest=""
+          while IFS= read -r f; do
+            if [ -f "$f" ]; then newest="$f"; break; fi
+          done < /tmp/zips.txt
+          echo "Using archive: $newest"
+          unzip -qo "$newest"
  
       - uses: actions/setup-java@v4
         with:
